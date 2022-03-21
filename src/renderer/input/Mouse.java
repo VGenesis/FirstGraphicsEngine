@@ -5,11 +5,12 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.ArrayList;
 
 public class Mouse implements MouseListener, MouseMotionListener, MouseWheelListener {
 	private int mouseX = -1;
 	private int mouseY = -1;
-	private int mouseB = -1;
+	private ArrayList<Integer> mouseB = new ArrayList<Integer> ();
 	private int scroll = 0;
 	
 	private double moveSensitivity = 1.0;
@@ -19,8 +20,12 @@ public class Mouse implements MouseListener, MouseMotionListener, MouseWheelList
 	
 	public int getY() {return this.mouseY;}
 	
-	public MouseMap getButton() {
-		return MouseMap.getAction(mouseB);
+	public ArrayList<MouseMap> getButtons() {
+		ArrayList<MouseMap> map = new ArrayList<MouseMap>();
+		for(int i : mouseB) {
+			map.add(MouseMap.getAction(i));
+		}
+		return map;
 	}
 	
 	public int getScroll() {return this.scroll;}
@@ -57,12 +62,14 @@ public class Mouse implements MouseListener, MouseMotionListener, MouseWheelList
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		this.mouseB = e.getButton();
+		this.mouseB.add(e.getButton());
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		this.mouseB = -1;
+		for(int i = 0; i < mouseB.size(); i++) {
+			if(e.getButton() == mouseB.get(i)) mouseB.remove(i);
+		}
 	}
 
 	@Override

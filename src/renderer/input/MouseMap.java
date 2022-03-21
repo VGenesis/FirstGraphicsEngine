@@ -1,6 +1,7 @@
 package renderer.input;
 
 public enum MouseMap{
+	NONE(0),
 	LCLICK(1),
 	MCLICK(2),
 	RCLICK(3),
@@ -19,6 +20,6 @@ public enum MouseMap{
 		for(MouseMap m : values()) {
 			if(m.value == value) return m;
 		}
-		return null;
+		return NONE;
 	}
 }

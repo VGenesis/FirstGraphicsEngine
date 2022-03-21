@@ -4,7 +4,7 @@ import java.awt.Point;
 import renderer.Display;
 
 public class PointConverter {
-	private static double scale = 1;
+	private static double scale = 4;
 	private static final double zoomFactor = 1.2;
 	private static double perspectiveScale = 640;
 	
@@ -18,7 +18,7 @@ public class PointConverter {
 		scale /= zoomFactor;
 	}
 	
-	public static Point convertPoint(MyPoint point3D) {
+	public static Point convertPoint(Point3D point3D) {
 		double x3d = point3D.y * scale;
 		double y3d = point3D.z * scale;
 		double depth = point3D.x * scale;
@@ -40,7 +40,7 @@ public class PointConverter {
 		return newVal;
 	}
 	
-	public static void rotateAxisX(MyPoint p, boolean CW, double degrees) {
+	public static void rotateAxisX(Point3D p, boolean CW, double degrees) {
 		double radius = Math.sqrt(p.y * p.y + p.z * p.z);
 		double theta = Math.atan2(p.z, p.y);
 		theta += Math.PI / 180 * degrees * (CW? -1: 1);
@@ -48,7 +48,7 @@ public class PointConverter {
 		p.z = radius * Math.sin(theta);
 	}
 	
-	public static void rotateAxisY(MyPoint p, boolean CW, double degrees) {
+	public static void rotateAxisY(Point3D p, boolean CW, double degrees) {
 		double radius = Math.sqrt(p.x * p.x + p.z * p.z);
 		double theta = Math.atan2(p.x, p.z);
 		theta += Math.PI / 180 * degrees * (CW? -1: 1);
@@ -56,7 +56,7 @@ public class PointConverter {
 		p.x = radius * Math.sin(theta);
 	}
 	
-	public static void rotateAxisZ(MyPoint p, boolean CW, double degrees) {
+	public static void rotateAxisZ(Point3D p, boolean CW, double degrees) {
 		double radius = Math.sqrt(p.x * p.x + p.y * p.y);
 		double theta = Math.atan2(p.y, p.x);
 		theta += Math.PI / 180 * degrees * (CW? -1: 1);

@@ -3,15 +3,14 @@ package renderer;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 
 import javax.swing.JFrame;
 
 import renderer.entity.EntityManager;
-import renderer.input.Mouse;
-import renderer.input.MouseMap;
-import renderer.point.MyVector;
+import renderer.input.InputManager;
 import renderer.point.PointConverter;
 
 public class Display extends Canvas implements Runnable{
@@ -23,23 +22,17 @@ public class Display extends Canvas implements Runnable{
 	public static final int SCREEN_WIDTH = 800;
 	public static final int SCREEN_HEIGHT= 600;
 	private static boolean running = false;
-	private static final int UPDATES_PER_SECOND = 60;
-	public static double render_distance = 100;
+	public static final int UPDATES_PER_SECOND = 60;
+	public static double render_distance = 10;
 
 	private EntityManager entityManager;
-	
-	private Mouse mouse;
+	private InputManager inputManager;
 	
 	public Display() {
 		this.frame = new JFrame();
 		
 		Dimension size = new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT);
 		this.setPreferredSize(size);
-		
-		this.mouse = new Mouse();
-		this.addMouseListener(this.mouse);
-		this.addMouseMotionListener(this.mouse);
-		this.addMouseWheelListener(this.mouse);
 	}
 	
 	public static void main(String[] args) {
@@ -71,10 +64,15 @@ public class Display extends Canvas implements Runnable{
 	private void init() {
 		PointConverter.setPerspectiveScale(1280);
 		
+		this.inputManager = new InputManager();
 		this.entityManager = new EntityManager();
 		this.entityManager.init();
-		this.mouse.setMoveSensitivity(0.5);
-		this.mouse.setScrollSensitivity(50);
+		this.addMouseListener(this.inputManager.mouse);
+		this.addMouseMotionListener(this.inputManager.mouse);
+		this.addMouseWheelListener(this.inputManager.mouse);
+		this.addKeyListener(this.inputManager.keyboard);
+		this.inputManager.mouse.setMoveSensitivity(0.5);
+		this.inputManager.mouse.setScrollSensitivity(50);
 	}
 	
 	@Override
@@ -122,34 +120,25 @@ public class Display extends Canvas implements Runnable{
 
 		this.entityManager.render(g);
 		
+		String text1 = "Left Click to rotate";
+		String text2 = "Right click to stop pulse";
+		String text3 = "Arrow Keys / WASD to move";
+		String text4 = "SHIFT/SPACE to elevate";
+		
+		
+		g.setColor(Color.white);
+		g.setFont(new Font("Plain", Font.PLAIN, 13));
+		g.drawChars(text1.toCharArray(), 0, text1.length(), 8, 16);
+		g.drawChars(text2.toCharArray(), 0, text2.length(), 8, 32);
+		g.drawChars(text3.toCharArray(), 0, text3.length(), 8, 48);
+		g.drawChars(text4.toCharArray(), 0, text4.length(), 8, 64);
+		
 		g.dispose();
 		bs.show();
 	}
 	
-	private int mouseInitialX, mouseInitialY;
 	private void update() {
-		if(mouse.getButton() == MouseMap.LCLICK) {
-			double mouseDeltaX = mouseInitialX - mouse.getX();
-			double mouseDeltaY = mouseInitialY - mouse.getY();
-			double sensitivity = mouse.getMoveSensitivity();
-			this.entityManager.rotate(true, 0, mouseDeltaY * sensitivity, mouseDeltaX * sensitivity);
-		}
-		
-		if(mouse.getButton() == MouseMap.MCLICK) {
-			double mouseDeltaX = mouseInitialX - mouse.getX();
-			double mouseDeltaY = mouseInitialY - mouse.getY();
-			this.entityManager.move(0, -mouseDeltaX, mouseDeltaY);
-		}
-
-		int mouseScroll = mouse.getScroll();
-		if(mouseScroll != 0) {
-			if(mouseScroll < 0) PointConverter.zoomIn();
-			else PointConverter.ZoomOut();
-		}
-		
-		mouseInitialX = mouse.getX();
-		mouseInitialY = mouse.getY();
-		mouse.resetScroll();
+		this.entityManager.update(inputManager);
 	}
 	
 }
